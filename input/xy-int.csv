@@ -1,0 +1,5 @@
+name,USL,USR,DSL,DSR
+GMN-BL03-SBS-22-5_final_correctors-1000_drives-1_1890_coil-update_lgv2_new,0,0,0,0
+x-range,0,5,-0.5,0.5
+y-range,0,5,-0.5,0.5
+z-range,0,0,-1200,500
