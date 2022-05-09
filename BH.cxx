@@ -95,12 +95,13 @@ int BH(){
    NonLinearBHCurve *bhDef = new NonLinearBHCurve(); 
    bhDef->SetData(bbd,hhd);  
 
-   std::string alloy = "1018";
+   std::string alloy = "1008";
    char inpath_test[200]; 
    sprintf(inpath_test,"./data/bh/%s.bh",alloy.c_str()); 
    NonLinearBHCurve *bhTest = new NonLinearBHCurve(alloy.c_str(),0,0,0,unts);
    bhTest->LoadData(inpath_test,"tsv",true,kConvertMKStoCGS);
    bhTest->Print();
+   bhTest->WriteFile("tenzeroeight.bh");
 
    std::string xAxis = "H";
    std::string yAxis = "B"; 
