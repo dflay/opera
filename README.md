@@ -5,7 +5,8 @@ in Hall A.
 
 # Prerequisites 
 
-The user should have the following installed: 
+For analysis and visualization of the Tosca/Opera magnetic field maps, the user should 
+have the following installed:  
 - The CERN [ROOT framework](https://root.cern.ch)
 - The utility library [util_df](https://github.com/dflay/util_df)
 
