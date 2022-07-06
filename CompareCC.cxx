@@ -6,6 +6,7 @@
 
 #include "TGraph2D.h"
 
+#include "JSONManager.hh"
 #include "CSVManager.hh"
 #include "UtilDFAlgorithm.hh"
 #include "UtilDFImport.hh"
@@ -38,25 +39,29 @@ int CompareCC(){
    char prefix[200];
    sprintf(prefix,"fin");   // "final" study files => correct corrector coil geometry, final currents/drives
 
-   // integration details 
-   // trajectory: nominally close to beam line center 
-   double x0 = 0; // -105.8; // 0.25; 
-   double y0 = 0; // 0; // 0.25; 
+   // read in parameters
+   util_df::JSONManager *jpars = new util_df::JSONManager(); 
+   jpars->ReadFile("./input/json/cc-compare.json");
 
-   // integration bounds on z 
-   double min = -1200; 
-   double max = 500;
-   double LENGTH = max-min;
+   // integration trajectory 
+   double x0 = jpars->GetValueFromSubKey<double>("integral","x0"); 
+   double y0 = jpars->GetValueFromSubKey<double>("integral","y0"); 
 
-   // plot range
-   double xMin = -1200; 
-   double xMax =  500; 
+   // integration bounds on z
+   double min = jpars->GetValueFromSubKey<double>("integral","min");
+   double max = jpars->GetValueFromSubKey<double>("integral","max");
+   double LENGTH = max - min;
+ 
+   // plot range 
+   double xMin = min; 
+   double xMax = max; 
 
-   util_df::CSVManager *pars = new util_df::CSVManager("csv"); 
-   pars->ReadFile("./input/cc-compare.csv",true);
-
+   // file names
    std::vector<std::string> fileName; 
-   pars->GetColumn_byName_str("name",fileName);
+   jpars->GetVectorFromKey_str("files",fileName);
+
+   // SBS angle 
+   double sbsAngle = jpars->GetValueFromSubKey<double>("config","sbs-angle");
 
    // currents 
    std::vector<double> USL,USR,DSL,DSR; 
@@ -107,7 +112,8 @@ int CompareCC(){
    std::vector<double> USLi,USRi,DSLi,DSRi; 
  
    double cc=0;
-   double sbsAngle = opera::GetSBSAngle(fileName[0]); // usually the same angle for every file 
+
+   bool isDebug = true;
 
    // read all files 
    for(int i=0;i<NF;i++){
@@ -120,7 +126,7 @@ int CompareCC(){
       // get simulation parameters
       sprintf(inpath_pars,"./data/%s/%s.res",prefix,fileName[i].c_str()); 
       std::cout << "Reading file: " << inpath_pars << "..." << std::endl;
-      rc = opera::ReadResFile(inpath_pars,sim_pars);
+      rc = opera::ReadResFile(inpath_pars,sim_pars,isDebug);
       if(rc==0){
 	 opera::PrintParameters(sim_pars);
       }else{

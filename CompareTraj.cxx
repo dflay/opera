@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "CSVManager.hh"
+#include "JSONManager.hh"
 #include "UtilDFGraph.hh"
 #include "UtilDFFunc.hh"
 
@@ -12,32 +13,32 @@
 
 int CompareTraj(){
 
-   bool useBeamE = true; // use alternate trajectory with specific beam energy tag 
+   bool useBeamE = false; // use alternate trajectory with specific beam energy tag 
 
-   double Ibeam = 30;  // in uA 
-   double Ebeam = 0;   // in GeV  
+   // read in parameters
+   util_df::JSONManager *jpars = new util_df::JSONManager();
+   jpars->ReadFile("./input/json/compare-traj.json");
 
-   util_df::CSVManager *par = new util_df::CSVManager("csv"); 
-   par->ReadFile("./input/traj-compare.csv",true);
-   // par->Print();
+   // file names
+   std::vector<std::string> fileName;
+   jpars->GetVectorFromKey_str("files",fileName);
 
-   std::vector<std::string> fileName; 
-   par->GetColumn_byName_str("name",fileName);
+   // kinematics 
+   double sbsAngle = jpars->GetValueFromSubKey<double>("config","sbs-angle");
+   double Ebeam    = jpars->GetValueFromSubKey<double>("config","beam-energy"); 
+   double Ibeam    = jpars->GetValueFromSubKey<double>("config","beam-current"); 
 
    std::vector<double> USL,USR,DSL,DSR; 
-   par->GetColumn_byName<double>("USL",USL); 
-   par->GetColumn_byName<double>("USR",USR); 
-   par->GetColumn_byName<double>("DSL",DSL); 
-   par->GetColumn_byName<double>("DSR",DSR); 
 
    const int N = fileName.size();
 
+   // vector of graphs 
    TGraphAsymmErrors **gBand = new TGraphAsymmErrors*[N]; 
-
+ 
+   // for the track files
    util_df::CSVManager *data = new util_df::CSVManager("csv"); 
 
    char inpath[200]; 
-
    std::vector<double> z,min,max;
   
    int color[5] = {kBlack,kRed+2,kBlue+2,kOrange,kViolet}; 
@@ -77,7 +78,8 @@ int CompareTraj(){
 	 resName = opera::getResNameFromTrackName_E(fileName[i],Ebeam,1);
          std::cout << Form("Beam energy = %.2lf GeV",Ebeam) << std::endl; 
       }else{
-	 resName = opera::getResNameFromTrackName(fileName[i]);  
+	 // resName = opera::getResNameFromTrackName(fileName[i]); 
+	 resName = fileName[i] + ".res";  
       }
       sprintf(inpath_pars,"./data/fin/%s",resName.c_str());
       // sprintf(inpath_pars,"./data/fin/%s.res",fileName[i].c_str());
@@ -120,7 +122,7 @@ int CompareTraj(){
    double yMin = 0; 
    double yMax = 1; 
 
-   TString Title      = Form("I = %.0lf #muA, E = %.2lf GeV",Ibeam,Ebeam);
+   TString Title      = Form("I = %.0lf #muA, E = %.2lf GeV, #theta_{SBS} = %.1lf#circ",Ibeam,Ebeam,sbsAngle);
    TString xAxisTitle = Form("z [cm]");
    TString yAxisTitle = Form("r [cm]");
 

@@ -6,6 +6,7 @@
 #include "UtilDFGraph.hh"
 #include "UtilDFFunc.hh"
 #include "CSVManager.hh"
+#include "JSONManager.hh"
 
 #include "./include/operaPoint.hh"
 #include "./src/operaUtilities.cc"
@@ -18,12 +19,20 @@ void findExtrema(std::vector<opera::point_t> track,std::vector<double> &z,std::v
 
 int Trajectories(){
 
-   TString Title      = Form("Particle Trajectories");    // GMn 
+   TString Title      = Form("Particle Trajectories");    
    TString xAxisTitle = Form("z [cm]");
    TString yAxisTitle = Form("r [cm]");
 
-   double xMin = -1500; 
-   double xMax = 0; 
+   // read in parameters
+   util_df::JSONManager *jpars = new util_df::JSONManager();
+   jpars->ReadFile("./input/json/traj.json");
+
+   // file name
+   std::string fileName = jpars->GetValueFromKey_str("file"); 
+
+   // distance along beam line  
+   double xMin = jpars->GetValueFromSubKey<double>("integral","min");
+   double xMax = jpars->GetValueFromSubKey<double>("integral","max");
 
    double yMin = 0; 
    double yMax = 1; 
@@ -33,10 +42,9 @@ int Trajectories(){
    double markerSize = 0.5; 
   
    TString label;  
-   char inpath[200],outpath[200],fileName[200];
-   sprintf(fileName,"GMN-BL03-SBS-22-5_tracks_correctors-zeroed_coil-update_lgv2_new_E-400");
-   sprintf(inpath  ,"./data/tracks/%s.lp" ,fileName);
-   sprintf(outpath ,"./output/%s_band.csv",fileName);
+   char inpath[200],outpath[200];
+   sprintf(inpath  ,"./data/tracks/%s.lp" ,fileName.c_str());
+   sprintf(outpath ,"./output/%s_band.csv",fileName.c_str());
  
    std::vector<opera::point_t> tracks; 
    int rc = opera::ReadTrackFile(inpath,tracks); 

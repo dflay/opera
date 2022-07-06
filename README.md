@@ -1,5 +1,5 @@
 # opera
-Tosca (Opera) Analysis Code and Command Input Files for Tosca Modeling. 
+Tosca (Opera) analysis code and command input files for tosca modeling. 
 This code is focused on the SBS GMn and GEn-II experiments at Jefferson Lab 
 in Hall A.
 
@@ -14,7 +14,7 @@ have the following installed:
 
 ## comi 
 
-The comi (Command Input Files) directory has files that contain Tosca/Opera code 
+The `comi` (Command Input Files) directory has files that contain Tosca/Opera code 
 that can generate a 3D model of a magnet system when loaded into Opera. 
 
 ## C++ Files 

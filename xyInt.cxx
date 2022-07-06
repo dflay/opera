@@ -12,6 +12,7 @@
 #include "TArc.h"
 
 #include "CSVManager.hh"
+#include "JSONManager.hh"
 #include "UtilDFAlgorithm.hh"
 #include "UtilDFImport.hh"
 #include "UtilDFMath.hh"
@@ -43,24 +44,30 @@ int xyInt(){
    // gStyle->SetPalette(kLightTemperature);
    // gStyle->SetPalette(kTemperatureMap);
 
-   util_df::CSVManager *pars = new util_df::CSVManager("csv"); 
-   pars->ReadFile("./input/xy-int.csv",true);
+   // read in parameters
+   util_df::JSONManager *jpars = new util_df::JSONManager();
+   jpars->ReadFile("./input/json/xy-int.json");
 
-   std::vector<std::string> fileName; 
-   pars->GetColumn_byName_str("name",fileName);
+   // file names
+   std::string fileName = jpars->GetVectorFromKey_str("file");
 
-   // only first row has the file name 
-   char inpath_pars[200];
-   sprintf(inpath_pars,"./data/fin/%s.res",fileName[0].c_str());
-
-   // now get bounds on x, y trajectories
-   std::vector<int> np;
-   pars->GetColumn_byIndex<int>(2,np); 
-
-   int nx = np[1];   
-   int ny = np[2];  
+   // bounds on x, y trajectories 
+   int nx      = jpars->GetValueFromSubKey<int>("x-pars","npts");
+   double xMin = jpars->GetValueFromSubKey<double>("x-pars","min");   
+   double xMax = jpars->GetValueFromSubKey<double>("x-pars","max");  
+ 
+   int ny      = jpars->GetValueFromSubKey<int>("y-pars","npts"); 
+   double yMin = jpars->GetValueFromSubKey<double>("y-pars","min");   
+   double yMax = jpars->GetValueFromSubKey<double>("y-pars","max"); 
+ 
+   int nz      = jpars->GetValueFromSubKey<int>("z-pars","npts"); 
+   double zMin = jpars->GetValueFromSubKey<double>("z-pars","min");   
+   double zMax = jpars->GetValueFromSubKey<double>("z-pars","max");  
  
    opera::parameters_t data; 
+   char inpath_pars[200];
+   sprintf(inpath_pars,"./data/fin/%s.res",fileName.c_str());
+
    int rc = opera::ReadResFile(inpath_pars,data);
    if(rc==0){
       std::cout << "Opening file: " << inpath_pars << std::endl;
@@ -68,22 +75,6 @@ int xyInt(){
    }else{
       return 1;
    } 
-
-   // get min and max of x and y for trajectories 
-   std::vector<double> min,max; 
-   pars->GetColumn_byIndex<double>(3,min); 
-   pars->GetColumn_byIndex<double>(4,max); 
-    
-   double xMin = min[1]; 
-   double yMin = min[2]; 
- 
-   double xMax = max[1]; 
-   double yMax = max[2]; 
-
-   // the last row is actually (zmin,zmax)
-   int N = min.size(); 
-   double zMin = min[N-1];
-   double zMax = max[N-1]; 
 
    // determine corrector current densities and currents 
    std::vector<std::string> ll; 
@@ -111,7 +102,7 @@ int xyInt(){
    std::string header = "X,Y,Z,BX,BY,BZ"; 
 
    char inpath1[200],inpath2[200],inpath3[200]; 
-   sprintf(inpath1,"./data/fin/%s.table",fileName[0].c_str()); 
+   sprintf(inpath1,"./data/fin/%s.table",fileName.c_str()); 
 
    int NSkip = 8; // for "raw" opera headers  
    // int NSkip = 11; // for g4sbs headers

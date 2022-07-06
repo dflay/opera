@@ -157,7 +157,7 @@ namespace opera {
 
       // load corrector dimensions
       util_df::CSVManager *data = new util_df::CSVManager();
-      data->ReadFile("./input/corr-dim.csv",true); 
+      data->ReadFile("./input/csv/corr-dim.csv",true); 
 
       std::vector<std::string> name; 
       data->GetColumn_byName_str("corr",name);
@@ -213,7 +213,7 @@ namespace opera {
       std::cout << Form("Number of non-zeros:       %d",data.NNonZeros)        << std::endl;
       std::cout << Form("Symmetry:                  %s",data.symmetry.c_str()) << std::endl;
  
-      std::cout << "Currents Densities: " << std::endl; 
+      std::cout << "Current Densities [A/cm^2]: " << std::endl; 
       int NC = data.I.size();
       for(int i=0;i<NC;i++) std::cout << Form("   %s: %.4lf",data.iLabel[i].c_str(),data.I[i]) << std::endl; 
 
@@ -261,6 +261,8 @@ namespace opera {
       // model size info 
       int NElem=0,NNode=0,NEqn=0,NNZ=0; 
 
+      int NLines = 14; // 12; // 12 for GMn 
+
       char msg[200]; 
  
       std::ifstream infile;
@@ -273,7 +275,7 @@ namespace opera {
 	    std::getline(infile,aLine);
 	    lineNum++;
 	    // find conductor info 
-            sprintf(phrase,"25 Biot-Savart conductors"); 
+            sprintf(phrase,"Biot-Savart conductors"); 
             foundConductors = util_df::IsInCharString(aLine.c_str(),phrase); 
             if(foundConductors){
 	       if(isDebug) std::cout << "Found conductors" << std::endl;
@@ -300,16 +302,25 @@ namespace opera {
             sprintf(phrase,"Drive sets and functions");
             foundDrives = util_df::IsInCharString(aLine.c_str(),phrase);
             if(foundDrives){
-	       if(isDebug) std::cout << "Found drives" << std::endl;
-               // read 12 lines; odd lines have the scaling factor 
-	       for(int i=0;i<12;i++){
+	       if(isDebug) std::cout << "[operaUtilities::ReadResFile]: Found drives" << std::endl;
+               // read NLines lines; odd lines have the scaling factor 
+	       for(int i=0;i<NLines;i++){
 		  std::getline(infile,aLine);
 		  util_df::SplitString(':',aLine,col);
 		  if(isDebug){
 		     std::cout << aLine << std::endl;
+                     std::cout << "Parsed: [";
 		     M = col.size();
-		     for(int j=0;j<M-1;j++) std::cout << col[j] << " ";
-		     std::cout << col[M-1] << std::endl;
+		     if(M>0){
+			for(int j=0;j<M-1;j++){
+			   util_df::RemoveWhiteSpace(col[j]);
+			   std::cout << col[j] << ",";
+                        }
+			util_df::RemoveWhiteSpace(col[M-1]);
+			std::cout << col[M-1];
+		     }
+		     std::cout << "]" << std::endl;
+		     std::cout << "------" << std::endl;
 		  } 
                   if(i%2!=0){
 		     if(i==1)  dd = std::atof(col[2].c_str()); 
@@ -318,6 +329,7 @@ namespace opera {
                      if(i==7)  dd = std::atof(col[2].c_str()); 
                      if(i==9)  dd = std::atof(col[2].c_str()); 
                      if(i==11) dd = std::atof(col[2].c_str()); 
+                     if(i==13) dd = std::atof(col[2].c_str()); 
 		     D.push_back(dd);
                   }else{
 		     if(i==0)  label = col[0]; 
@@ -326,6 +338,7 @@ namespace opera {
                      if(i==6)  label = col[0]; 
                      if(i==8)  label = col[0]; 
                      if(i==10) label = col[0];
+                     if(i==12) label = col[0];
 		     dl.push_back(label); 
                   }
 		  col.clear();
@@ -337,7 +350,7 @@ namespace opera {
             sprintf(phrase,"Model size information"); 
             foundModelSize = util_df::IsInCharString(aLine.c_str(),phrase); 
             if(foundModelSize){
-	       if(isDebug) std::cout << "Found model information" << std::endl;
+	       if(isDebug) std::cout << "[operaUtilities::ReadResFile]: Found model information" << std::endl;
 	       for(int i=0;i<5;i++){
 		  std::getline(infile,aLine);  
                   if(i>0){
@@ -354,7 +367,7 @@ namespace opera {
             // find model symmetry 
             foundSymmetry = util_df::IsInCharString(aLine.c_str(),"Symmetry"); 
             if(foundSymmetry){
-	       if(isDebug) std::cout << "Found model symmetry" << std::endl;
+	       if(isDebug) std::cout << "[operaUtilities::ReadResFile]: Found model symmetry" << std::endl;
 	       std::getline(infile,aLine); 
 	       sym = aLine;
 	       lineNum++; 
@@ -379,12 +392,15 @@ namespace opera {
       M = dl.size(); 
       for(int i=0;i<M;i++){
 	 util_df::RemoveWhiteSpace(dl[i]);
-         if(dl[i].compare("RIGHT")==0  || dl[i].compare("right")==0) dl[i] = "right";  
-         if(dl[i].compare("LEFT")==0   || dl[i].compare("left")==0 ) dl[i] = "left";  
-	 if(dl[i].compare("COMP2R")==0 || dl[i].compare("CORUR")==0) dl[i] = "corr_usr"; 
-	 if(dl[i].compare("COMP2L")==0 || dl[i].compare("CORUL")==0) dl[i] = "corr_usl"; 
-	 if(dl[i].compare("COMP3R")==0 || dl[i].compare("CORDR")==0) dl[i] = "corr_dsr"; 
-	 if(dl[i].compare("COMP3L")==0 || dl[i].compare("CORDL")==0) dl[i] = "corr_dsl"; 
+         if(dl[i].compare("RIGHT")==0  || dl[i].compare("right")==0)  dl[i] = "right";  
+         if(dl[i].compare("LEFT")==0   || dl[i].compare("left")==0 )  dl[i] = "left";  
+         if(dl[i].compare("COIL")==0   || dl[i].compare("coil")==0)   dl[i] = "coil";  
+         if(dl[i].compare("SADDLE")==0 || dl[i].compare("saddle")==0) dl[i] = "saddle";  
+	 if(dl[i].compare("COMP2R")==0 || dl[i].compare("CORUR")==0)  dl[i] = "corr_usr"; 
+	 if(dl[i].compare("COMP2L")==0 || dl[i].compare("CORUL")==0)  dl[i] = "corr_usl"; 
+	 if(dl[i].compare("COMP3R")==0 || dl[i].compare("CORDR")==0)  dl[i] = "corr_dsr"; 
+	 if(dl[i].compare("COMP3L")==0 || dl[i].compare("CORDL")==0)  dl[i] = "corr_dsl"; 
+	 if(dl[i].compare("CUR01")==0 )                               dl[i] = "cur01"; 
       } 
 
       // set struct info 

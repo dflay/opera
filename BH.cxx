@@ -20,137 +20,50 @@ int BH(){
    std::string units = "CGS"; 
    std::string steel = "annealed"; // "cold-roll"; 
 
-   int N = 45; 
-   double bMin = 0; 
-   double bMax = 2.5; // in Tesla 
+   NonLinearBHCurve *bh_1030_old = new NonLinearBHCurve("1030_old");
+   bh_1030_old->LoadData("./data/bh/tenthirty.bh","tsv",true,0);
 
-   // annealed 1030 steel 
-   double k1_an = 50; 
-   double k2_an = 1.371; 
-   double k3_an = 645.3; 
+   NonLinearBHCurve *bh_1030_new = new NonLinearBHCurve("1030");
+   bh_1030_new->LoadData("./data/bh/tenthirty.bh","tsv",true,0);
 
-   // cold rolled 1030 steel 
-   double k1_cr = 40; 
-   double k2_cr = 1.416; 
-   double k3_cr = 1212; 
+   NonLinearBHCurve *bh_1006_old = new NonLinearBHCurve("1006_old");
+   bh_1006_old->LoadData("./data/bh/default.bh","tsv",true,0);
 
-   double k1=0,k2=0,k3=0;
-   if(steel.compare("annealed")==0){
-      k1 = k1_an; k2 = k2_an; k3 = k3_an;
-   }else{
-      k1 = k1_cr; k2 = k2_cr; k3 = k3_cr;
-   }
-
-   int unts = util_df::Units::kMKS;
-   if(units.compare("CGS")==0) unts = util_df::Units::kCGS;
-
-   NonLinearBHCurve *bh = new NonLinearBHCurve(steel.c_str(),k1,k2,k3,unts);
-   bh->Calculate(N,bMin,bMax);
-   bh->WriteFile("tenthirty.bh");  
-
-   std::vector<double> B,H; 
-   bh->GetData(B,H); 
-
-   NonLinearBHCurve *bh_cr = new NonLinearBHCurve("1030_cold-rolled",k1_cr,k2_cr,k3_cr,unts);
-   bh_cr->Calculate(N,bMin,bMax); 
-   bh_cr->WriteFile("tenthirty_cr.bh"); 
-   
-   std::vector<double> B_cr,H_cr,BoH_cr; 
-   bh_cr->GetData(B_cr,H_cr);  
-
-   NonLinearBHCurve *bh_an = new NonLinearBHCurve("1030_annealed",k1_an,k2_an,k3_an,unts);
-   bh_an->Calculate(N,bMin,bMax); 
-   bh_an->WriteFile("tenthirty_an.bh"); 
-   
-   std::vector<double> B_an,H_an; 
-   bh_an->GetData(B_an,H_an); 
-
-   // compare to GEP12long BH curve 
-   util_df::CSVManager *gep = new util_df::CSVManager("tsv");
-   gep->ReadFile("./data/bh/tenthirty_gep.bh",true);
-   std::vector<double> bb,hh; 
-   gep->GetColumn_byIndex<double>(0,bb);   
-   gep->GetColumn_byIndex<double>(1,hh);   
- 
-   NonLinearBHCurve *bhGEp = new NonLinearBHCurve(); 
-   bhGEp->SetData(bb,hh);  
-
-   // mild steel 
-   util_df::CSVManager *mild = new util_df::CSVManager("tsv");
-   mild->ReadFile("./data/bh/mildaverage.bh",true);
-   std::vector<double> bbm,hhm; 
-   mild->GetColumn_byIndex<double>(0,bbm);   
-   mild->GetColumn_byIndex<double>(1,hhm);  
- 
-   NonLinearBHCurve *bhMil = new NonLinearBHCurve(); 
-   bhMil->SetData(bbm,hhm);  
-
-   // default steel 
-   util_df::CSVManager *def = new util_df::CSVManager("tsv");
-   def->ReadFile("./data/bh/default.bh",true);
-   std::vector<double> bbd,hhd; 
-   def->GetColumn_byIndex<double>(0,bbd);   
-   def->GetColumn_byIndex<double>(1,hhd);  
-   
-   NonLinearBHCurve *bhDef = new NonLinearBHCurve(); 
-   bhDef->SetData(bbd,hhd);  
-
-   std::string alloy = "1008";
-   char inpath_test[200]; 
-   sprintf(inpath_test,"./data/bh/%s.bh",alloy.c_str()); 
-   NonLinearBHCurve *bhTest = new NonLinearBHCurve(alloy.c_str(),0,0,0,unts);
-   bhTest->LoadData(inpath_test,"tsv",true,kConvertMKStoCGS);
-   bhTest->Print();
-   bhTest->WriteFile("tenzeroeight.bh");
+   NonLinearBHCurve *bh_1008_new = new NonLinearBHCurve("1008");
+   bh_1008_new->LoadData("./data/bh/1008.bh","tsv",true,kConvertMKStoCGS);
 
    std::string xAxis = "H";
    std::string yAxis = "B"; 
 
-   TGraph *g = GetTGraph(bh,xAxis,yAxis);
-   util_df::Graph::SetParameters(g,20,kBlack);
-   
-   TGraph *gGEP = GetTGraph(bhGEp,xAxis,yAxis);
-   util_df::Graph::SetParameters(gGEP,20,kBlue); 
+   int lineWidth = 4; 
+   double markerSize = 1.0; 
 
-   TGraph *gDEF = GetTGraph(bhDef,xAxis,yAxis); 
-   util_df::Graph::SetParameters(gDEF,20,kViolet+2);
+   TGraph *g1030_old = GetTGraph(bh_1030_old,xAxis,yAxis);
+   util_df::Graph::SetParameters(g1030_old,21,kBlack,markerSize,lineWidth);
 
-   TGraph *gMIL = GetTGraph(bhMil,xAxis,yAxis); 
-   util_df::Graph::SetParameters(gMIL,20,kGreen+2);
+   TGraph *g1030_new = GetTGraph(bh_1030_new,xAxis,yAxis);
+   util_df::Graph::SetParameters(g1030_new,20,kRed,markerSize,lineWidth);
+   g1030_new->SetLineStyle(2);
 
-   TGraph *gTEST = GetTGraph(bhTest,xAxis,yAxis); 
-   util_df::Graph::SetParameters(gTEST,20,kMagenta);
+   TGraph *g1006_old = GetTGraph(bh_1006_old,xAxis,yAxis);
+   util_df::Graph::SetParameters(g1006_old,21,kBlue,markerSize,lineWidth);
 
-   TGraph *gAN = util_df::Graph::GetTGraph(H_an,B_an); 
-   TGraph *gCR = util_df::Graph::GetTGraph(H_cr,B_cr);
-   util_df::Graph::SetParameters(gAN,21,kBlack);
-   util_df::Graph::SetParameters(gCR,20,kRed);
+   TGraph *g1008_new = GetTGraph(bh_1008_new,xAxis,yAxis);
+   util_df::Graph::SetParameters(g1008_new,20,kCyan+2,markerSize,lineWidth);
+   g1008_new->SetLineStyle(2);
 
    TMultiGraph *mg = new TMultiGraph();
-   mg->Add(g   ,"lp");  
-   mg->Add(gGEP,"lp");  
-   mg->Add(gCR ,"lp"); 
-   mg->Add(gDEF,"lp"); 
-   mg->Add(gMIL,"lp");
-   mg->Add(gTEST,"lp"); 
+   mg->Add(g1030_old,"c");  
+   mg->Add(g1030_new,"c");  
+   mg->Add(g1006_old,"c");  
+   mg->Add(g1008_new,"c");  
 
    TLegend *LL = new TLegend(0.6,0.6,0.8,0.8);
-   LL->AddEntry(g    ,"1030 (DF calc, annealed)"   ,"p"); 
-   LL->AddEntry(gCR  ,"1030 (DF calc, cold-rolled)","p"); 
-   LL->AddEntry(gGEP ,"GEp Build (Opera)"          ,"p"); 
-   LL->AddEntry(gDEF ,"Default (Opera)"            ,"p"); 
-   LL->AddEntry(gMIL ,"Mild Avg (Opera)"           ,"p"); 
-   LL->AddEntry(gTEST,alloy.c_str()                ,"p"); 
+   LL->AddEntry(g1030_old,"Beamline Shielding: 1030 (Old build)","l"); 
+   LL->AddEntry(g1030_new,"Beamline Shielding: 1030 (New build)","l"); 
+   LL->AddEntry(g1006_old,"SBS and Corrector Yokes: Default (Old build)"       ,"l"); 
+   LL->AddEntry(g1008_new,"SBS and Corrector Yokes: 1008 (New build)"          ,"l"); 
 
-   TMultiGraph *mgc = new TMultiGraph();
-   mgc->Add(gAN,"lp"); 
-   mgc->Add(gCR,"lp"); 
-
-   TLegend *L = new TLegend(0.6,0.6,0.8,0.8); 
-   L->AddEntry(gAN,"Annealed"   ,"p"); 
-   L->AddEntry(gCR,"Cold Rolled","p"); 
-
-   TString TitleC     = Form("B vs H for 1030 Steel");
    TString Title      = Form("B vs H for Various Materials");
    TString xAxisTitle = Form("H (A/m)");
    TString yAxisTitle = Form("B (T)");
@@ -173,21 +86,6 @@ int BH(){
    mg->Draw("a");
    LL->Draw("same");
    c1->Update(); 
-
-   TCanvas *c2 = new TCanvas("c2","B vs H (annealed vs cold rolled)",1000,600);
- 
-   c2->cd();
-   gPad->SetLogx();  
-   mgc->Draw("a"); 
-   util_df::Graph::SetLabels(mgc,TitleC,xAxisTitle,yAxisTitle); 
-   mgc->GetXaxis()->SetLimits(xMin,xMax); 
-   mgc->Draw("a");
-   L->Draw("same"); 
-   c2->Update();
-
-   delete bh; 
-   delete bh_cr; 
-   delete bh_an; 
 
    return 0;
 }

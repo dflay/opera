@@ -1,0 +1,5 @@
+{
+"config"   : {"name": "GEN-1", "beam-energy": 2.2, "beam-current": 45, "sbs-angle" : 34.7, "bb-angle": 47.5},
+"files"    : ["GEN-1_correctors-zeroed_new","GEN-1_correctors-1000_drives-2_new","GEN-1_correctors-1000_drives-4_new"],
+"integral" : {"min": -1200, "max": 500, "x0": 0, "y0": 0} 
+}
