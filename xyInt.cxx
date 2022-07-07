@@ -49,7 +49,7 @@ int xyInt(){
    jpars->ReadFile("./input/json/xy-int.json");
 
    // file names
-   std::string fileName = jpars->GetVectorFromKey_str("file");
+   std::string fileName = jpars->GetValueFromKey_str("file");
 
    // bounds on x, y trajectories 
    int nx      = jpars->GetValueFromSubKey<int>("x-pars","npts");

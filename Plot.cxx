@@ -11,6 +11,7 @@
 #include "TStopwatch.h"
 
 #include "CSVManager.hh"
+#include "JSONManager.hh"
 #include "UtilDFAlgorithm.hh"
 #include "UtilDFImport.hh"
 #include "UtilDFMath.hh"
@@ -37,7 +38,7 @@ bool conv_T_to_G   = false;
 std::vector<double> gL,gbx,gby,gbz; 
 std::vector<double> zz,bbx,bby,bbz; 
 
-int PlotSimple(){
+int Plot(){
 
    // subdirectory prefix in the data directory
    char prefix[200]; 
@@ -47,17 +48,14 @@ int PlotSimple(){
    // gStyle->SetPalette(kLightTemperature);
    // gStyle->SetPalette(kTemperatureMap);
 
-   util_df::CSVManager *pars = new util_df::CSVManager("csv"); 
-   pars->ReadFile("./input/plot-simple.csv",true);
+   util_df::JSONManager *jpars = new util_df::JSONManager(); 
+   jpars->ReadFile("./input/json/plot.json"); 
 
-   std::vector<std::string> fileName; 
-   pars->GetColumn_byName_str("name",fileName);
-   // the last row is actually (x,y,zmin,zmax)
-   fileName.pop_back();
+   std::string fileName = jpars->GetValueFromKey_str("file"); 
 
    // read parameters 
    char inpath_pars[200];
-   sprintf(inpath_pars,"./data/%s/%s.res",prefix,fileName[0].c_str());
+   sprintf(inpath_pars,"./data/%s/%s.res",prefix,fileName.c_str());
  
    opera::parameters_t data; 
    int rc = opera::ReadResFile(inpath_pars,data);
@@ -67,31 +65,20 @@ int PlotSimple(){
       return 1;
    } 
 
-   // currents 
-   std::vector<double> USL,USR,DSL,DSR; 
-   pars->GetColumn_byName<double>("USL",USL);
-   pars->GetColumn_byName<double>("USR",USR);
-   pars->GetColumn_byName<double>("DSL",DSL);
-   pars->GetColumn_byName<double>("DSR",DSR);
-   int N = USL.size(); 
-
    // the last row is actually (x,y,zmin,zmax)
-   double x0   = USL[N-1];
-   double y0   = USR[N-1]; 
-   double zMin = DSL[N-1];
-   double zMax = DSR[N-1]; 
- 
-   // now pop-back
-   USL.pop_back(); USR.pop_back(); DSL.pop_back(); DSR.pop_back(); 
+   double x0   = jpars->GetValueFromSubKey<double>("integral","x0" );
+   double y0   = jpars->GetValueFromSubKey<double>("integral","y0" ); 
+   double zMin = jpars->GetValueFromSubKey<double>("integral","min");
+   double zMax = jpars->GetValueFromSubKey<double>("integral","max"); 
 
    // get currents from res file 
    std::vector<double> Icm2,I; 
    std::vector<std::string> ll; 
    opera::CalculateCorrectorCurrents(data,ll,Icm2,I);  
 
-   std::vector<double> USRi,USLi,DSRi,DSLi; 
-
    int NN = ll.size();
+   std::vector<double> USL(NN),USR(NN),DSL(NN),DSR(NN); 
+   std::vector<double> USRi,USLi,DSRi,DSLi; 
    for(int i=0;i<NN;i++){
       if(ll[i].compare("USR")==0){
 	 USR[0]  = Icm2[i]; 
@@ -121,15 +108,15 @@ int PlotSimple(){
    // data file header 
    std::string header = "X,Y,Z,BX,BY,BZ"; 
 
-   char inpath1[200],inpath2[200],inpath3[200]; 
-   sprintf(inpath1,"./data/%s/%s.table",prefix,fileName[0].c_str()); 
+   char table_path[200],inpath2[200],inpath3[200]; 
+   sprintf(table_path,"./data/%s/%s.table",prefix,fileName.c_str()); 
 
    int NSkip = 8; // for "raw" opera headers  
    // int NSkip = 11; // for g4sbs headers
  
    // field map 
    util_df::CSVManager *f1 = new util_df::CSVManager("tsv"); 
-   rc = f1->ReadFile(inpath1,false,NSkip);
+   rc = f1->ReadFile(table_path,false,NSkip);
    if(rc!=0) return 1;
    f1->SetHeader(header);
 

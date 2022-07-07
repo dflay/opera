@@ -12,13 +12,14 @@ have the following installed:
 
 # Directories 
 
+## C++ Files 
+
+The directories `include`, `src`, and `input` contain code and text files used for 
+the C++ files (`*.cxx`).  These scripts work in the CERN ROOT framework and are used 
+for visualizing and analyzing data produced by Tosca/Opera. 
+ 
 ## comi 
 
 The `comi` (Command Input Files) directory has files that contain Tosca/Opera code 
 that can generate a 3D model of a magnet system when loaded into Opera. 
 
-## C++ Files 
-
-The directories `include`, `src`, and `input` contain code used for the C++ files 
-(`*.cxx`).  These scripts work in the CERN ROOT framework and are used for visualizing 
-and analyzing data produced by Tosca/Opera.  
