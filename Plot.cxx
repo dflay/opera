@@ -24,7 +24,6 @@
 
 int StoreToGlobalVectors(util_df::CSVManager *data,double x0,double y0); 
 
-double IntegrateField_xySlice(util_df::CSVManager *data,std::string yAxis,double x0,double y0,int units); 
 double fieldFunc_x(const double z);
 double fieldFunc_y(const double z);
 double fieldFunc_z(const double z);
@@ -65,7 +64,7 @@ int Plot(){
       return 1;
    } 
 
-   // the last row is actually (x,y,zmin,zmax)
+   // get trajectory and integral parameters 
    double x0   = jpars->GetValueFromSubKey<double>("integral","x0" );
    double y0   = jpars->GetValueFromSubKey<double>("integral","y0" ); 
    double zMin = jpars->GetValueFromSubKey<double>("integral","min");
@@ -201,62 +200,6 @@ int Plot(){
    c1->Update(); 
 
    return 0;
-}
-//______________________________________________________________________________
-double IntegrateField_xySlice(util_df::CSVManager *data,std::string yAxis,double x0,double y0,int units){
-   // compute the field integral of a field component yAxis along the z axis
-   std::vector<double> x,y,z; 
-   data->GetColumn_byName<double>("X",x);   
-   data->GetColumn_byName<double>("Y",y);   
-   data->GetColumn_byName<double>("Z",z);  
-
-   std::vector<double> b;
-   if(yAxis.compare("bmod")==0){
-      opera::GetBMod(data,b);
-   }else{
-      data->GetColumn_byName<double>(yAxis,b); 
-   }
-
-   // B units; input data are in Gauss  
-   std::string unitName = "Gauss";
-   const int N = x.size();
-   if(units==opera::kTesla){
-      for(int i=0;i<N;i++) b[i] /= 1E+4; 
-      unitName = "Tesla";  
-   }
-
-   if(conv_T_to_G){
-      for(int i=0;i<N;i++) b[i] *= 1E+4;  
-   }
-
-   double sf=1;
-   if(conv_mm_to_cm) sf = 1E-1;  
-
-   // choose values for a given (x0,y0)
-   double step=0;
-   double z_prev=z[0];  
-   std::vector<double> L,B;  
-   for(int i=0;i<N;i++){
-      if( abs(x[i]-x0/sf)<1E-3 && abs(y[i]-y0/sf)<1E-3 ){
-	 L.push_back(z[i]); 
-	 B.push_back(b[i]); 
-	 step = z[i]-z_prev;
-      }
-      z_prev = z[i]; 
-   }
-
-   // compute integral; units are [cm*B-field], with B-field in Gauss or Tesla 
-   double sum=0,stepSum=0,bSum=0;
-   const int NN = L.size();
-   for(int i=0;i<NN;i++){
-      sum     += step*B[i];
-      stepSum += step; 
-      bSum    += B[i]; 
-   }
-   sum += 0; // get rid of -0 result   
-   // std::cout << Form("[IntegrateField_xySlice]: Step size = %.3lf cm, step sum = %.3lf cm, B sum = %.3lf %s",
-   //                   step,stepSum,bSum,unitName.c_str()) << std::endl;
-   return sum; 
 }
 //______________________________________________________________________________
 int StoreToGlobalVectors(util_df::CSVManager *data,double x0,double y0){
