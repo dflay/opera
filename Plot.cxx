@@ -20,7 +20,6 @@
 #include "./include/operaMagneticFieldPoint.hh"
 #include "./include/operaParameters.hh"
 #include "./src/operaUtilities.cc"
-// #include "./src/operaIntegrator.cc"
 
 int StoreToGlobalVectors(util_df::CSVManager *data,double x0,double y0); 
 
@@ -140,12 +139,6 @@ int Plot(){
    bInt_simp[0] = util_df::Math::SimpsonIntegral(&fieldFunc_x,zMin,zMax); 
    bInt_simp[1] = util_df::Math::SimpsonIntegral(&fieldFunc_y,zMin,zMax); 
    bInt_simp[2] = util_df::Math::SimpsonIntegral(&fieldFunc_z,zMin,zMax);
-
-   // opera::Integrator *myInt = new opera::Integrator(); 
-   // myInt->SetData(f1,x0,y0); 
-   // bInt_simp[0] = myInt->Integrate("BX",zMin,zMax); 
-   // bInt_simp[1] = myInt->Integrate("BY",zMin,zMax); 
-   // bInt_simp[2] = myInt->Integrate("BZ",zMin,zMax); 
 
    char axis[3] = {'x','y','z'};
 

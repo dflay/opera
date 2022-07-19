@@ -7,13 +7,13 @@ namespace opera {
    enum bUnits { kTesla, kGauss };
 
    typedef struct magneticFieldPt {
-      double x;
-      double y;
-      double z;
-      double bx;
-      double by;
-      double bz;
-      double bmod;
+      double x;    // x coordinate
+      double y;    // y coordinate 
+      double z;    // z coordinate
+      double bx;   // bx value  
+      double by;   // by value 
+      double bz;   // bz value
+      double bmod; // |B| = sqrt( bx*bx + by*by + bz*bz )  
 
      // constructor 
      magneticFieldPt(): 
