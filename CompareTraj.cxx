@@ -23,10 +23,15 @@ int CompareTraj(){
    std::vector<std::string> fileName;
    jpars->GetVectorFromKey_str("files",fileName);
 
-   // kinematics 
-   double sbsAngle = jpars->GetValueFromSubKey<double>("config","sbs-angle");
-   double Ebeam    = jpars->GetValueFromSubKey<double>("config","beam-energy"); 
-   double Ibeam    = jpars->GetValueFromSubKey<double>("config","beam-current"); 
+   // config file 
+   std::string confName = jpars->GetValueFromKey_str("config"); 
+   util_df::JSONManager *cf = new util_df::JSONManager(); 
+   cf->ReadFile("./input/json/gen-conf.json"); 
+
+   // kinematics
+   double sbsAngle = cf->GetValueFromSubKey<double>(confName,"sbs-angle");
+   double Ebeam    = cf->GetValueFromSubKey<double>(confName,"beam-energy"); 
+   double Ibeam    = cf->GetValueFromSubKey<double>(confName,"beam-current"); 
 
    std::vector<double> USL,USR,DSL,DSR; 
 

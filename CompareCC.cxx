@@ -60,8 +60,13 @@ int CompareCC(){
    std::vector<std::string> fileName; 
    jpars->GetVectorFromKey_str("files",fileName);
 
+   // config file 
+   std::string confName = jpars->GetValueFromKey_str("config");
+   util_df::JSONManager *cf = new util_df::JSONManager();
+   cf->ReadFile("./input/json/gen-conf.json");
+
    // SBS angle 
-   double sbsAngle = jpars->GetValueFromSubKey<double>("config","sbs-angle");
+   double sbsAngle = cf->GetValueFromSubKey<double>(confName,"sbs-angle");
 
    // currents 
    std::vector<double> USL,USR,DSL,DSR; 

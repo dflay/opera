@@ -1,5 +1,5 @@
 {
-"config"   : {"name": "GEN-2", "beam-energy": 4.3, "beam-current": 45, "sbs-angle" : 34.7, "bb-angle": 47.5},
+"config"   : "GEN-2",
 "file"     : "GEN-2_correctors-zeroed_true-current_new",
 "x-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
 "y-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
