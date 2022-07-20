@@ -1,6 +1,6 @@
 {
-"config"   : {"name": "GEN-1", "beam-energy": 2.2, "beam-current": 45, "sbs-angle" : 34.7, "bb-angle": 47.5},
-"file"     : "GEN-1_correctors-zeroed_true-current_new",
+"config"   : {"name": "GEN-2", "beam-energy": 4.3, "beam-current": 45, "sbs-angle" : 34.7, "bb-angle": 47.5},
+"file"     : "GEN-2_correctors-zeroed_true-current_new",
 "x-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
 "y-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
 "z-pars"   : {"min": -1200, "max": 500, "npts": 1750}

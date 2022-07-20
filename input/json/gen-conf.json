@@ -1,0 +1,10 @@
+{
+"config-01": {"label": "GEN-1", "Q2": 1.8, "beam-energy": 2.2, "beam-current": 45, 
+              "sbs-current": 840 , "sbs-angle": 34.7, "bb-current": 700, "bb-angle": 47.1},
+"config-02": {"label": "GEN-2", "Q2": 3.0, "beam-energy": 4.3, "beam-current": 45, 
+              "sbs-current": 1260, "sbs-angle": 34.7, "bb-current": 700, "bb-angle": 29.5},
+"config-03": {"label": "GEN-3", "Q2": 6.8, "beam-energy": 6.4, "beam-current": 45, 
+              "sbs-current": 1575, "sbs-angle": 22.1, "bb-current": 700, "bb-angle": 35.9},
+"config-04": {"label": "GEN-4", "Q2": 9.9, "beam-energy": 8.5, "beam-current": 45, 
+              "sbs-current": 2100, "sbs-angle": 18.0, "bb-current": 700, "bb-angle": 35.0}
+}
