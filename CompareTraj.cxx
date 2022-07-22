@@ -24,7 +24,8 @@ int CompareTraj(){
    jpars->GetVectorFromKey_str("files",fileName);
 
    // config file 
-   std::string confName = jpars->GetValueFromKey_str("config"); 
+   std::string confName = jpars->GetValueFromKey_str("config");
+   std::cout << "Reading configuration: " << confName << std::endl; 
    util_df::JSONManager *cf = new util_df::JSONManager(); 
    cf->ReadFile("./input/json/gen-conf.json"); 
 

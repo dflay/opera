@@ -1,5 +1,5 @@
 {
-"config"   : "config-02",
-"file"     : "GEN-2_correctors-zeroed_true-current_new",
+"config"   : "GEN-4",
+"file"     : "GEN-4_correctors-zeroed_new",
 "integral" : {"min": -1200, "max": 500, "x0": 0, "y0": 0} 
 }
