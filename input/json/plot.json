@@ -1,5 +1,5 @@
 {
-"config"   : "GEN-4",
-"file"     : "GEN-4_correctors-zeroed_new",
+"config"   : "GEN-3",
+"file"     : "GEN-3_correctors-1000_drives-1_trial-2_new",
 "integral" : {"min": -1200, "max": 500, "x0": 0, "y0": 0} 
 }

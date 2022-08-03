@@ -1,6 +1,6 @@
 {
-"config"   : "GEN-4",
-"file"     : "GEN-4_correctors-zeroed_new",
+"config"   : "GEN-3",
+"file"     : "GEN-3_correctors-zeroed_trial-2_new",
 "x-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
 "y-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
 "z-pars"   : {"min": -1200, "max": 500, "npts": 1750}
