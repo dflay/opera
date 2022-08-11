@@ -9,6 +9,7 @@
 #include "TGraph2D.h"
 #include "TArc.h"
 #include "TStopwatch.h"
+#include "TPaveText.h"
 
 #include "CSVManager.hh"
 #include "JSONManager.hh"
@@ -140,12 +141,45 @@ int Plot(){
    bInt_simp[1] = util_df::Math::SimpsonIntegral(&fieldFunc_y,zMin,zMax); 
    bInt_simp[2] = util_df::Math::SimpsonIntegral(&fieldFunc_z,zMin,zMax);
 
+   // additional integrals for specific points along beam line 
+   double zMin_us = -300; double zMax_us = 200; 
+   double bInt_simp_us[3]; 
+   bInt_simp_us[0] = util_df::Math::SimpsonIntegral(&fieldFunc_x,zMin_us,zMax_us); 
+   bInt_simp_us[1] = util_df::Math::SimpsonIntegral(&fieldFunc_y,zMin_us,zMax_us); 
+   bInt_simp_us[2] = util_df::Math::SimpsonIntegral(&fieldFunc_z,zMin_us,zMax_us);
+
+   double zMin_ds = -1200; double zMax_ds = -400; 
+   double bInt_simp_ds[3]; 
+   bInt_simp_ds[0] = util_df::Math::SimpsonIntegral(&fieldFunc_x,zMin_ds,zMax_ds); 
+   bInt_simp_ds[1] = util_df::Math::SimpsonIntegral(&fieldFunc_y,zMin_ds,zMax_ds); 
+   bInt_simp_ds[2] = util_df::Math::SimpsonIntegral(&fieldFunc_z,zMin_ds,zMax_ds);
+
    char axis[3] = {'x','y','z'};
 
-   std::cout << Form("Integration for (x,y) = (%.2lf,%.2lf) cm, z = %.2lf to %.2lf",x0,y0,zMin,zMax) << std::endl;
+   std::cout << Form("FULL Integration for (x,y) = (%.2lf,%.2lf) cm, z = %.2lf to %.2lf",x0,y0,zMin,zMax) << std::endl;
    for(int i=0;i<3;i++){
       std::cout << Form("B%c*dz = %.3lf %s-cm",axis[i],bInt_simp[i],yAxisUnits.c_str()) << std::endl;
    }
+   std::cout << Form("UPSTREAM Integration for (x,y) = (%.2lf,%.2lf) cm, z = %.2lf to %.2lf",x0,y0,zMin_us,zMax_us) << std::endl;
+   for(int i=0;i<3;i++){
+      std::cout << Form("B%c*dz = %.3lf %s-cm",axis[i],bInt_simp_us[i],yAxisUnits.c_str()) << std::endl;
+   }
+   std::cout << Form("DOWNSTREAM Integration for (x,y) = (%.2lf,%.2lf) cm, z = %.2lf to %.2lf",x0,y0,zMin_ds,zMax_ds) << std::endl;
+   for(int i=0;i<3;i++){
+      std::cout << Form("B%c*dz = %.3lf %s-cm",axis[i],bInt_simp_ds[i],yAxisUnits.c_str()) << std::endl;
+   }
+
+   TString Text_us = Form("(x,y) = (%.2lf,%.2lf) cm, #int_{%.1lf}^{%.1lf} Bx dz = %.1lf %s-cm, #int_{%.1lf}^{%.1lf} By dz = %.1lf %s-cm",
+                             x0,y0,zMin_us,zMax_us,bInt_simp_us[0],yAxisUnits.c_str(),zMin_us,zMax_us,bInt_simp_us[1],yAxisUnits.c_str());
+
+   TString Text_ds = Form("(x,y) = (%.2lf,%.2lf) cm, #int_{%.1lf}^{%.1lf} Bx dz = %.1lf %s-cm, #int_{%.1lf}^{%.1lf} By dz = %.1lf %s-cm",
+                             x0,y0,zMin_ds,zMax_ds,bInt_simp_ds[0],yAxisUnits.c_str(),zMin_ds,zMax_ds,bInt_simp_ds[1],yAxisUnits.c_str());
+
+   TPaveText *textUS = new TPaveText(0.05,0.3,0.95,0.6);
+   textUS->AddText(Text_us); 
+
+   TPaveText *textDS = new TPaveText(0.05,0.3,0.95,0.6);
+   textDS->AddText(Text_ds); 
 
    TStopwatch *watch = new TStopwatch(); 
 
@@ -189,7 +223,9 @@ int Plot(){
    mg->Draw("a"); 
    util_df::Graph::SetLabels(mg,Title,xAxisTitle,yAxisTitle);
    mg->Draw("a");
-   L->Draw("same"); 
+   L->Draw("same");
+   textUS->Draw("same");  
+   textDS->Draw("same");  
    c1->Update(); 
 
    return 0;

@@ -1,6 +1,6 @@
 {
-"config"   : "GEN-2",
-"file"     : "GEN-2_correctors-zeroed_trial-2_new",
+"config"   : "GEN-1",
+"file"     : "GEN-1_correctors-1000_drives-4_trial-2_new",
 "x-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
 "y-pars"   : {"min": -0.5, "max": 0.5, "npts": 5},
 "z-pars"   : {"min": -1200, "max": 500, "npts": 1750}
